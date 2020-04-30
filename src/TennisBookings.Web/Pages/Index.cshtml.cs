@@ -27,17 +27,18 @@ namespace TennisBookings.Web.Pages
 
         public async Task OnGet()
         {
-            var homePage = _configuration.GetSection("Features:HomePage");
-            if (homePage.GetValue<bool>("EnableGreeting"))
+            var features = new Features();
+            _configuration.Bind("Features:HomePage", features);
+            if (features.EnableGreeting)
             {
                 Greeting = _greetingService.GetRandomGreeting();
             }
 
-            ShowWeatherForecast = homePage.GetValue<bool>("EnableWeatherForecast");
+            ShowWeatherForecast = features.EnableWeatherForecast;
 
             if (ShowWeatherForecast)
             {
-                var title = homePage["ForecastSectionTitle"];
+                var title = features.ForecastSectionTitle;
 
                 ForecastSectionTitle = title;
                 var currenWeather = await _weatherForecaster.GetCurrentWeatherAsync();
@@ -60,6 +61,15 @@ namespace TennisBookings.Web.Pages
                     }
                 }
             }
+        }
+
+        private class Features
+        {
+            public bool EnableGreeting { get; set; }
+
+            public bool EnableWeatherForecast { get; set; }
+
+            public string ForecastSectionTitle { get; set; }
         }
     }
 }
