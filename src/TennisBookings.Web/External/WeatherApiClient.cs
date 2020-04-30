@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using TennisBookings.Web.External.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using TennisBookings.Web.Configuration;
 
 namespace TennisBookings.Web.External
 {
@@ -12,11 +14,11 @@ namespace TennisBookings.Web.External
         private readonly HttpClient _httpClient;
         private readonly ILogger<WeatherApiClient> _logger;
 
-        public WeatherApiClient(HttpClient httpClient, IConfiguration config, ILogger<WeatherApiClient> logger)
+        public WeatherApiClient(HttpClient httpClient, IOptionsMonitor<ExternalServicesConfig> options, ILogger<WeatherApiClient> logger)
         {
-            var url = config["ExternalServices:WeatherApiUrl"];
+            var externalServiceConfig = options.Get(ExternalServicesConfig.WeatherApi);
 
-            httpClient.BaseAddress = new Uri(url);
+            httpClient.BaseAddress = new Uri(externalServiceConfig.Url);
 
             _httpClient = httpClient;
             _logger = logger;
