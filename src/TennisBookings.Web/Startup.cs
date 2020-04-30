@@ -35,6 +35,7 @@ namespace TennisBookings.Web
             //    .ValidateDataAnnotations();
 
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<HomePageConfiguration>, HomePageConfigurationValidation>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<ExternalServicesConfig>, ExternalServicesConfigurationValidation>());
 
             services.AddHostedService<ValidateOptionsService>();
 
