@@ -8,6 +8,8 @@ using TennisBookings.Web.Data;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Hosting;
 using TennisBookings.Web.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace TennisBookings.Web
 {
@@ -28,11 +30,24 @@ namespace TennisBookings.Web
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.Configure<HomePageConfiguration>(Configuration.GetSection("Features:HomePage"));
+            //services.AddOptions<HomePageConfiguration>()
+            //    .Bind(Configuration.GetSection("Features:HomePage"))
+            //    .ValidateDataAnnotations();
+
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<HomePageConfiguration>, HomePageConfigurationValidation>());
+
+            services.AddHostedService<ValidateOptionsService>();
 
             services.Configure<GreetingConfiguration>(Configuration.GetSection("Features:Greeting"));
 
+            services.Configure<WeatherForecastingConfiguration>(Configuration.GetSection("Features:WeatherForecasting"));
+
             services.Configure<ExternalServicesConfig>(ExternalServicesConfig.WeatherApi, Configuration.GetSection("ExternalServices:WeatherApi"));
             services.Configure<ExternalServicesConfig>(ExternalServicesConfig.ProductsApi, Configuration.GetSection("ExternalServices:ProductApi"));
+
+            services.Configure<ContentConfiguration>(Configuration.GetSection("Content"));
+            services.AddSingleton<IContentConfiguration>(sp =>
+                sp.GetRequiredService<IOptions<ContentConfiguration>>().Value);
 
             services
                 .AddAppConfiguration(Configuration)
@@ -48,7 +63,8 @@ namespace TennisBookings.Web
                 .AddCaching()
                 .AddTimeServices()
                 .AddAuditing()
-                .AddExternalProducts();
+                .AddExternalProducts()
+                .AddContentServices();
 
             services.AddControllersWithViews();
             services.AddRazorPages(options =>
